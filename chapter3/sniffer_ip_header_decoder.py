@@ -37,6 +37,9 @@ class IP(Structure):
     def __init__(self, socket_buffer=None):
         # map protocol constants to their names
         self.protocol_map = {1:"ICMP", 6:"TCP", 17:"UDP"}
+        ## '@I' is unisigned int in native order. because c_ulong is 4 bytes in i386 and 8 in amd64
+        self.src_address = socket.inet_ntoa(struct.pack("@I",self.src))
+        self.dst_address = socket.inet_ntoa(struct.pack("@I",self.dst))
 
     # human readble form
         try:
@@ -70,7 +73,7 @@ try:
         ip_header = IP(raw_buffer[0:32])
 
         ## print out the protocol that was detected and the hosts
-        print("[*] Protocol {}:{} -> {} ".format(ip_header.protocol, ip_header.src, ip_header.dst))
+        print("[*] Protocol {}:{} -> {} ".format(ip_header.protocol, ip_header.src_address, ip_header.dst_address))
 except KeyboardInterrupt:
     if os.name == 'nt':
         sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
